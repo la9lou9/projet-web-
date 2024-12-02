@@ -1,0 +1,23 @@
+/* src/components/Home.css */
+.about{
+    
+ display: flex; /* Use Flexbox layout */
+flex-direction: column; /* Stack children vertically */
+min-height: 100vh; /* Full height of the viewport */
+     
+    
+}  
+.contenu {
+    margin-top: 150px; /* Espace pour le header fixe */
+    padding: 10px;
+    color: #f4a261;
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: left; /* Justifie le texte */
+    overflow-x:auto ;
+  }
+.contenu h2{
+        text-align: left;
+        color: black;
+        margin-left: 20px;
+}  

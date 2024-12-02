@@ -1,0 +1,49 @@
+* {
+  box-sizing: border-box; /* Makes sizing easier */
+  margin: 0;
+  padding: 0;
+}
+
+
+.home {
+  display: flex; /* Use Flexbox layout */
+  flex-direction: column; /* Stack children vertically */
+  min-height: 100vh; /* Full height of the viewport */
+  background-color: #0a7075;
+
+}
+
+
+
+.content {
+  margin-top: 100px;
+  flex: 1; /* Take up the remaining space */
+  padding: 20px; /* Padding for the main content */
+  background-color: #0a7075; /* Main background color */
+  display: flex; /* Use Flexbox for content */
+  flex-direction: row; /* Stack children vertically */
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
+  width: 80%;
+  gap: 30px;
+  margin-left: 180px;
+}
+
+
+img{
+  height: 300px;
+  width: 350px;
+}
+.content h2 {
+  text-align: left; 
+  font-size: 30px; 
+  color: #000; 
+}
+
+.content p {
+  margin: 20px 0; 
+  padding: 0;
+  font-size: 22px; 
+  width: 100%;
+
+}

@@ -1,0 +1,66 @@
+/* src/components/Header.css */
+.header {
+  position: fixed; /* Fixe le header en haut de la page */
+  top: 0;
+  left: 0;
+  width: 100%; /* S'étend sur toute la largeur de la page */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #274d60; /* Couleur de fond */
+  padding: 10px 20px;
+  z-index: 1000; /* S'assure que le header reste au-dessus du contenu */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optionnel : ajoute une ombre pour le style */
+  
+
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-image {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+.c1 {
+  font-family: OCR A Std, monospace;
+  position: absolute;
+  left: 70px; /* Décale l'élément de 20px de la limite gauche */
+  top: 15px ;
+  color: #fff;
+  font-size: 18px;
+  margin: 0;
+  padding: 0 10px ;
+}
+
+.c2 {
+  font-family: OCR A Std, monospace;
+  position: absolute;
+  left: 70px; /* Décale l'élément de 20px de la limite gauche */
+  top: 35px ;
+  color: #fff;
+  font-size: 18px;
+  margin: 0;
+  padding: 0 10px ;
+}
+
+.nav a {
+  position: relative;
+  right: 200px;
+  color: #000;
+  background-color: #fff;
+  padding: 8px 20px;
+  margin: 0 20px;
+  border-radius: 8px;
+  text-decoration: double;
+  font-size: 25px;
+  font-family: Brush Script MT, Brush Script Std, cursive;
+}
+
+.nav a:hover {
+  background-color: #6ba3be;
+}
