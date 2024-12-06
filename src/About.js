@@ -1,7 +1,7 @@
 // src/components/Home.js
 import React from 'react';
 import Header from './Header';
-import './About.css';
+import './styles/About.css';
 import Footer from './Footer';
 
 

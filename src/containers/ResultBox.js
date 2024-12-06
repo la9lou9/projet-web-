@@ -1,5 +1,5 @@
 import React from "react";
-import "./ResultBox.css";
+import "../styles/boxes/ResultBox.css";
 
 function ResultBox({ result }) {
   if (!result) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Importation du hook useNavigate
-import './MatrixOptions.css';
+import '../styles/boxes/MatrixOptions.css';
 
 function MatrixOptions() {
   const [sizeOption, setSizeOption] = useState('');

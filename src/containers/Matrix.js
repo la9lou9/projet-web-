@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import "./Matrix.css";
+import "../styles/boxes/Matrix.css";
 
 function Matrix({ generatedMatrix, onSizeChange, onResult }) {
   const initialSize = generatedMatrix ? generatedMatrix.length : 3;
   const [size, setSize] = useState(initialSize);
   const [matrix, setMatrix] = useState(
-    generatedMatrix || Array(initialSize).fill().map(() => Array(initialSize).fill(""))
+    generatedMatrix || Array(initialSize).fill(0).map(() => Array(initialSize).fill(""))
   );
   const [columnVector, setColumnVector] = useState(Array(initialSize).fill(""));
   const [matrixType, setMatrixType] = useState("");
@@ -146,7 +146,7 @@ function Matrix({ generatedMatrix, onSizeChange, onResult }) {
   };
 
   const clearMatrix = () => {
-    setMatrix(Array(size).fill().map(() => Array(size).fill("")));
+    setMatrix(Array(size).fill(0).map(() => Array(size).fill("")));
     setColumnVector(Array(size).fill(""));
   };
 

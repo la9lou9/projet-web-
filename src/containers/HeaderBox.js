@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; // Remplacer useHistory par useNavigate
-import "./HeaderBox.css"
+import "../styles/boxes/HeaderBox.css"
 import 'font-awesome/css/font-awesome.min.css';
 
 

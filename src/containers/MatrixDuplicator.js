@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./MatrixDuplicator.css";
+import "../styles/boxes/MatrixDuplicator.css";
 
 function MatrixDuplicator() {
   const [matrix, setMatrix] = useState(null);
