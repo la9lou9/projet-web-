@@ -174,6 +174,8 @@ export class MatrixSolver {
          * @returns True if diagonal; otherwise, false.
          */
         const isDiagonal = (matrix: number[][]): boolean => {
+            // One condition in loop
+            this.addComplexity(this.complexity.verification, [0,1]);
             return matrix.every((row, i) => row.every((value, j) => (i === j || value === 0)));
         };
 
@@ -195,6 +197,8 @@ export class MatrixSolver {
                     }
                 }
             }
+            // Two conditions
+            this.addComplexity(this.complexity.verification, [0,0,2]);
             if (isLower) return 'lower';
             if (isUpper) return 'upper';
             return null;
@@ -214,6 +218,9 @@ export class MatrixSolver {
                     }
                 }
             }
+            //One substraction. One Absolute function. One Max function in nested loop
+            //One final if
+            this.addComplexity(this.complexity.verification, [1,0,3]);
             return bandWidth < n ? bandWidth : null;
         };
 
@@ -228,6 +235,10 @@ export class MatrixSolver {
             matrix.forEach((row) => row.forEach((value) => {
                 if (value === 0) zeroCount++;
             }));
+            //One multiplication.
+            //One if. One addition in nested loop
+            //One division. one if
+            this.addComplexity(this.complexity.verification, [3,0,2]);
             return zeroCount / totalElements > 0.5; // Sparse if >50% zeros
         };
 
@@ -323,6 +334,16 @@ export class MatrixSolver {
         initialGuess?: number[]
     ): number[] {
         const n = this.vector.length;
+
+        // Check if the matrix is diagonally dominant, attempt to make it so if not
+        if (!this.isDiagonallyDominant(this.getMatrix())) {
+            console.warn('Matrix is not diagonally dominant. Attempting to modify it...');
+            if (!this.makeDiagonallyDominant()) {
+                throw new Error('Failed to make the matrix diagonally dominant.');
+            }
+            console.info('Matrix successfully modified to be diagonally dominant.');
+        }
+
         let x: number[] = initialGuess ? [...initialGuess] : Array(n).fill(0);
 
         // Check for zero diagonal elements before starting iterations
@@ -339,18 +360,24 @@ export class MatrixSolver {
             console.warn('Convergence is not guaranteed for this matrix.');
         }
 
+        const precomputedNonDiagElements: Array<Array<{ index: number; value: number }>> = Array.from(
+            { length: n },
+            (_, i) => this.getNonDiagonalNonZeroRowElements(i)
+        );
+
         // Proceed with Gauss-Seidel iterations
         let converged = false;
+
+        this.addComplexity(this.complexity.solving, [2, 2]); // Complexity for initial setup
 
         for (let iteration = 0; iteration < maxIterations; iteration++) {
             const xOld = [...x];
 
             for (let i = 0; i < n; i++) {
-                const nonDiagElements = this.getNonDiagonalNonZeroRowElements(i);
                 let sum = 0;
 
-                // Iterate over non-zero, non-diagonal elements
-                for (const { index: j, value } of nonDiagElements) {
+                // Iterate over precomputed non-zero, non-diagonal elements
+                for (const { index: j, value } of precomputedNonDiagElements[i]) {
                     sum += value * x[j];
                 }
 
@@ -364,6 +391,7 @@ export class MatrixSolver {
             // Archive iteration results if enabled
             if (this.archive) {
                 this.archive.push({ old: xOld, new: [...x], error });
+                this.addComplexity(this.complexity.storing, [0, 1]); // Archiving complexity
             }
 
             // Check for convergence
@@ -372,6 +400,8 @@ export class MatrixSolver {
                 this.solved = 'solved';
                 break;
             }
+
+            this.addComplexity(this.complexity.solving, [5, 7, 2]); // Complexity per iteration
         }
 
         if (!converged) {
@@ -383,6 +413,7 @@ export class MatrixSolver {
 
         return x;
     }
+
 
     /**
      * Checks if the matrix satisfies the convergence criteria for the Gauss-Seidel method.
@@ -433,6 +464,7 @@ export class MatrixSolver {
         // Update the matrix and vector with the new arrangement
         this.matrix = this.storeMatrix(newMatrix);
         this.vector = newVector;
+        this.addComplexity(this.complexity.decomposition, [5,3,3,0.5]);
         return true;
     }
 
@@ -463,6 +495,7 @@ export class MatrixSolver {
                 }
             }
         }
+        this.addComplexity(this.complexity.decomposition, [1.5,4.5,3.833]);
         return L;
     }
 
@@ -563,11 +596,11 @@ export class MatrixSolver {
         const maxLen = Math.max(tLen, aLen);
         const newCoeffs = new Array(maxLen).fill(0);
 
-        // Align from the right (lowest terms align)
+        // Since lowest order is first, we just align from the start:
         for (let i = 0; i < maxLen; i++) {
-            const tVal = (i < tLen) ? target.coefficients[tLen - i - 1] : 0;
-            const aVal = (i < aLen) ? added[aLen - i - 1] : 0;
-            newCoeffs[maxLen - i - 1] = tVal + aVal;
+            const tVal = i < tLen ? target.coefficients[i] : 0;
+            const aVal = i < aLen ? added[i] : 0;
+            newCoeffs[i] = tVal + aVal;
         }
 
         target.coefficients = newCoeffs;
@@ -734,6 +767,7 @@ export class MatrixSolver {
                 }
             }
         }
+        this.addComplexity(this.complexity.verification, [0,-1,1]);
         return true;
     }
 
@@ -757,6 +791,13 @@ export class MatrixSolver {
      * @returns True if diagonally dominant; otherwise, false.
      */
     private isDiagonallyDominant(matrix: number[][]): boolean {
+        // One abs function.
+        // One addition. One Absolute function. One condition in loop
+        // One sum in loop
+        // One condition
+        this.addComplexity(this.complexity.verification, [2,4]);
+
+        // Check if each diagonal element is greater than the sum of other elements in the row
         return matrix.every((row, i) => {
             const diag = Math.abs(row[i]);
             const sum: number = row.reduce((acc, val, j) => acc + (i !== j ? Math.abs(val) : 0), 0);
@@ -865,8 +906,7 @@ export class MatrixSolver {
             }
 
             // Create a new MatrixSolver instance
-            const solver = new MatrixSolver(jsonData.matrix, jsonData.vector, archiveIterations);
-            return solver;
+            return new MatrixSolver(jsonData.matrix, jsonData.vector, archiveIterations);
         } catch (error) {
             throw new Error(`Failed to import from JSON: ${(error as Error).message}`);
         }
