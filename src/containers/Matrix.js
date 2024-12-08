@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../styles/boxes/Matrix.css";
+import "../styles/container styles/Matrix.css";
 
 function Matrix({ generatedMatrix, onSizeChange, onResult }) {
   const initialSize = generatedMatrix ? generatedMatrix.length : 3;

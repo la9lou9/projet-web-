@@ -1,6 +1,6 @@
 // src/components/MatrixUploadAuto.js
 import React, { useState } from "react";
-import "../styles/boxes/MatrixUploadAuto.css";
+import "../styles/container styles/MatrixUploadAuto.css";
 
 function MatrixUploadAuto() {
   const [matrix, setMatrix] = useState([]); // Stocker la matrice importée du 1er fichier

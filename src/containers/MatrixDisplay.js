@@ -1,6 +1,6 @@
 // src/components/MatrixDisplay.js
 import React from "react";
-import "../styles/boxes/MatrixDisplay.css";
+import "../styles/container styles/MatrixDisplay.css";
 
 function MatrixDisplay({ matrix }) {
   if (!matrix || matrix.length === 0) {

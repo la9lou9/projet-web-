@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../styles/boxes/MatrixTypeSelector.css";
+import "../styles/container styles/MatrixTypeSelector.css";
 
 function MatrixTypeSelector({ matrixType, setMatrixType, generateMatrix }) {
   const [sizeInput, setSizeInput] = useState("");

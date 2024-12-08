@@ -77,6 +77,17 @@ interface MatrixProperties {
     property: 'normal' | 'diagonally-dominant' | 'symmetric-positive-definite' | 'other';
 }
 
+interface PolynomialComplexity {
+    coefficients: number[]; // Just the coefficients now, highest order first.
+}
+
+interface Complexity {
+    verification: PolynomialComplexity;
+    storing: PolynomialComplexity;
+    decomposition: PolynomialComplexity;
+    solving: PolynomialComplexity;
+}
+
 /**
  * Combined matrix storage type that includes storage optimization and matrix properties.
  */
@@ -106,6 +117,7 @@ export class MatrixSolver {
     private matrix: MatrixStorage;
     private vector: number[];
     private archive?: IterationResult[];
+    private complexity: Complexity;
     private solved: 'not-yet' | 'solved' | 'did-not-converge';
 
     /**
@@ -135,6 +147,12 @@ export class MatrixSolver {
         // Initialize archiving if requested
         this.archive = archiveIterations ? [] : undefined;
         this.solved = 'not-yet';
+        this.complexity = {
+            verification: { coefficients: [] },
+            storing: { coefficients: [] },
+            decomposition: { coefficients: [] },
+            solving: { coefficients: [] },
+        };
     }
 
     /**
@@ -371,26 +389,10 @@ export class MatrixSolver {
      * @returns True if the method is expected to converge without modification; otherwise, false.
      */
     private checkConvergenceCriteria(): boolean {
-        const matrix = this.getMatrix();
-
-        // If the matrix is diagonally dominant, it will converge
-        if (this.isDiagonallyDominant(matrix)) {
-            return true;
-        }
-
-        // If the matrix is symmetric positive definite, it will converge
-        if (this.isSymmetric(matrix) && this.isPositiveDefinite(matrix)) {
-            return true;
-        }
-
-        // Additional checks can be added here (e.g., M-matrix)
-
-        // If none of the conditions are met, convergence is not guaranteed
-        return false;
+        const property = this.matrix.property;
+        return ( property=="diagonally-dominant" || property=="symmetric-positive-definite")
     }
 
-
-    // CURRENTLY UNUSED //
     /**
      * Attempts to modify the matrix to make it diagonally dominant by rearranging rows.
      * @returns True if the matrix was modified to be diagonally dominant; otherwise, false.
@@ -553,6 +555,22 @@ export class MatrixSolver {
             default:
                 throw new Error(`Unsupported or unknown matrix type: ${type}`);
         }
+    }
+
+    private addComplexity(target: PolynomialComplexity, added: number[]): void {
+        const tLen = target.coefficients.length;
+        const aLen = added.length;
+        const maxLen = Math.max(tLen, aLen);
+        const newCoeffs = new Array(maxLen).fill(0);
+
+        // Align from the right (lowest terms align)
+        for (let i = 0; i < maxLen; i++) {
+            const tVal = (i < tLen) ? target.coefficients[tLen - i - 1] : 0;
+            const aVal = (i < aLen) ? added[aLen - i - 1] : 0;
+            newCoeffs[maxLen - i - 1] = tVal + aVal;
+        }
+
+        target.coefficients = newCoeffs;
     }
 
     /**
