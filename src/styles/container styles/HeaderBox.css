@@ -1,0 +1,32 @@
+/* Conteneur des boutons avec une couleur de fond et largeur de 80% */
+.header-box {
+    display: flex;
+    gap: 150px; /* Espacement entre les boutons */
+    justify-content: center; /* Centrer les boutons horizontalement */
+    margin-top: 10px; /* Ajouter un peu d'espace au-dessus */
+    padding: 15px 30px; /* Espacement intérieur autour des boutons */
+    background-color: #274d60; /* Couleur de fond du box */
+    border-radius: 10px; /* Coins arrondis pour le box */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre légère pour donner du relief */
+    width: 40%; /* Elargir le box à 80% de la largeur du conteneur parent */
+    margin: 0 auto; /* Centrer le box horizontalement */
+  }
+  
+  /* Styles des boutons */
+  .header-box-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #6ba3be;
+    color: white;
+    border: #274d60;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 5px;
+  }
+  
+  /* Effet de survol sur les boutons */
+  .header-box-button:hover {
+    background-color: #274d60;
+  }
+  
