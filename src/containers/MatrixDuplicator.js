@@ -39,7 +39,6 @@ function MatrixDuplicator() {
     let solver = new MatrixSolver(A,b);
     let x = solver.solve(tolerance,maxIterations);
 
-    saveFinalResultsToFile(x, solver.getResults().length, solver.getSolved() === "solved"); // Sauvegarde la solution finale avec état de convergence
     setSolution(x);
     setIterations(solver.getResults.length);
     setIterationResults(solver.getResults()); // Enregistre toutes les itérations
@@ -108,7 +107,8 @@ Convergence : ${hasConverged ? "Oui" : "Non"}
 
   const handleGaussSeidel = () => {
     if (matrix && vector) {
-      gaussSeidel(matrix, vector, epsilon, maxIterations);
+      let solver = gaussSeidel(matrix, vector, epsilon, maxIterations);
+      saveFinalResultsToFile(x, solver.getResults().length, solver.getSolved() === "solved"); // Sauvegarde la solution finale avec état de convergence
     } else {
       setStatusMessage("Veuillez d'abord télécharger un fichier valide.");
     }
