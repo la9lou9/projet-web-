@@ -108,7 +108,7 @@ Convergence : ${hasConverged ? "Oui" : "Non"}
   const handleGaussSeidel = () => {
     if (matrix && vector) {
       let solver = gaussSeidel(matrix, vector, epsilon, maxIterations);
-      saveFinalResultsToFile(x, solver.getResults().length, solver.getSolved() === "solved"); // Sauvegarde la solution finale avec état de convergence
+      saveFinalResultsToFile(solver.getResults().at(-1).new, solver.getResults().length, solver.getSolved() === "solved"); // Sauvegarde la solution finale avec état de convergence
     } else {
       setStatusMessage("Veuillez d'abord télécharger un fichier valide.");
     }
