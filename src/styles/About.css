@@ -8,16 +8,28 @@ min-height: 100vh; /* Full height of the viewport */
     
 }  
 .contenu {
-    margin-top: 150px; /* Espace pour le header fixe */
-    padding: 10px;
+    margin-top: 0px; /* Espace pour le header fixe */
+    padding: 200px;
     color: #f4a261;
-    font-size: 18px;
+    font-size: 24px;
+    color: white;
     line-height: 1.6;
     text-align: left; /* Justifie le texte */
     overflow-x:auto ;
   }
+
 .contenu h2{
-        text-align: left;
-        color: black;
-        margin-left: 20px;
-}  
+    text-align: left;
+    margin-left: 20px;
+    color: white;
+}
+
+.contenu p{
+    color: white;
+}
+
+.contenu p a{
+    font-weight: bolder;
+    color: lightgray;
+    text-decoration: none;
+}

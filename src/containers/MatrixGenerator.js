@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./MatrixGenerator.css";
+import {genererSymPos} from "../fonctions/genererSymPos";
 
 // Fonction pour générer une valeur aléatoire
 const getRandomValue = () => Math.floor(Math.random() * 10) + 1;
@@ -22,37 +23,42 @@ function MatrixGenerator() {
     let matrix = [];
     let vector = [];
 
-    // Initialisation de la matrice avec des valeurs aléatoires
-    for (let i = 0; i < size; i++) {
-      let row = [];
-      for (let j = 0; j < size; j++) {
-        if (matrixType === "Upper Triangular" && j < i) {
-          row.push(0); // Partie inférieure de la matrice (triangulaire supérieure)
-        } else if (matrixType === "Lower Triangular" && j > i) {
-          row.push(0); // Partie supérieure de la matrice (triangulaire inférieure)
-        } else if (matrixType === "Band" && Math.abs(i - j) > numBands) {
-          row.push(0); // Éléments hors bande spécifiée
-        } else if (matrixType === "Diagonal" && i !== j) {
-          row.push(0); // Seulement la diagonale a des valeurs
-        } else if (matrixType === "Upper Band" && (i - j) > numBands) {
-          row.push(0); // Éléments hors de la bande supérieure
-        } else if (matrixType === "Lower Band" && (j - i) > numBands) {
-          row.push(0); // Éléments hors de la bande inférieure
-        } else {
-          row.push(getRandomValue()); // Valeurs aléatoires
+    if (matrixType === "Symmetric" && matrixProperty==="Définie Positive") {
+      matrix = genererSymPos(size);
+    } else {
+
+      // Initialisation de la matrice avec des valeurs aléatoires
+      for (let i = 0; i < size; i++) {
+        let row = [];
+        for (let j = 0; j < size; j++) {
+          if (matrixType === "Upper Triangular" && j < i) {
+            row.push(0); // Partie inférieure de la matrice (triangulaire supérieure)
+          } else if (matrixType === "Lower Triangular" && j > i) {
+            row.push(0); // Partie supérieure de la matrice (triangulaire inférieure)
+          } else if (matrixType === "Band" && Math.abs(i - j) > numBands) {
+            row.push(0); // Éléments hors bande spécifiée
+          } else if (matrixType === "Diagonal" && i !== j) {
+            row.push(0); // Seulement la diagonale a des valeurs
+          } else if (matrixType === "Upper Band" && (i - j) > numBands) {
+            row.push(0); // Éléments hors de la bande supérieure
+          } else if (matrixType === "Lower Band" && (j - i) > numBands) {
+            row.push(0); // Éléments hors de la bande inférieure
+          } else {
+            row.push(getRandomValue()); // Valeurs aléatoires
+          }
         }
+        matrix.push(row);
       }
-      matrix.push(row);
+
+    }
+    for (let i = 0; i < size; i++) {
       vector.push(getRandomValue()); // Génère un vecteur colonne
     }
 
     // Appliquer les propriétés après la génération initiale
     if (matrixProperty === "Diagonale Dominante") {
       makeMatrixDiagonallyDominant(matrix);
-    } else if (matrixProperty === "Définie Positive") {
-      makeMatrixPositiveDefinite(matrix);
     }
-
     saveToFile(matrix, vector); // Sauvegarde dans un fichier JSON
   };
 

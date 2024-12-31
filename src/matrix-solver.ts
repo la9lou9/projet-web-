@@ -1,12 +1,3 @@
-/* TODO:
-    - Move SPD and DD to 'property' and change all methods (DONE!!)
-    - Implement better error communication to the website. (50%????)
-    - Implement a private decomposition function.          (DONE)
-    - Make solve() always converge when possible.          (DONE??)
-    - Somehow Add makeDD to archive                        --------
-    - More Comments and JSDoc                              (JSDoc 90% / COMMENTS 20%)
-*/
-
 // Type definitions for different matrix storage types
 
 /**
@@ -128,6 +119,12 @@ export class MatrixSolver {
      * @throws Error if the matrix and vector sizes are incompatible or the matrix is not square.
      */
     constructor(m?: number[][], b?: number[], archiveIterations: boolean = true) {
+        this.complexity = {
+            verification: { coefficients: [] },
+            storing: { coefficients: [] },
+            decomposition: { coefficients: [] },
+            solving: { coefficients: [] },
+        };
         if (m && b) {
             // Validate matrix and vector sizes
             if (b.length !== m.length) {
@@ -147,12 +144,6 @@ export class MatrixSolver {
         // Initialize archiving if requested
         this.archive = archiveIterations ? [] : undefined;
         this.solved = 'not-yet';
-        this.complexity = {
-            verification: { coefficients: [] },
-            storing: { coefficients: [] },
-            decomposition: { coefficients: [] },
-            solving: { coefficients: [] },
-        };
     }
 
     /**
@@ -335,9 +326,10 @@ export class MatrixSolver {
     ): number[] {
         const n = this.vector.length;
 
-        // Check if the matrix is diagonally dominant, attempt to make it so if not
-        if (!this.isDiagonallyDominant(this.getMatrix())) {
+        // Check if the matrix is diagonally dominant (or sdp), attempt to make it so if not
+        if ( this.matrix.property === "normal" || this.matrix.property === "other" ) {
             console.warn('Matrix is not diagonally dominant. Attempting to modify it...');
+            console.log(this.matrix.type,this.matrix.property)
             if (!this.makeDiagonallyDominant()) {
                 throw new Error('Failed to make the matrix diagonally dominant.');
             }
@@ -596,7 +588,7 @@ export class MatrixSolver {
         const maxLen = Math.max(tLen, aLen);
         const newCoeffs = new Array(maxLen).fill(0);
 
-        // Since lowest order is first, we just align from the start:
+        // Lowest order is first, we just align from the start:
         for (let i = 0; i < maxLen; i++) {
             const tVal = i < tLen ? target.coefficients[i] : 0;
             const aVal = i < aLen ? added[i] : 0;
@@ -790,7 +782,7 @@ export class MatrixSolver {
      * @param matrix - The matrix to check.
      * @returns True if diagonally dominant; otherwise, false.
      */
-    private isDiagonallyDominant(matrix: number[][]): boolean {
+    public isDiagonallyDominant(matrix: number[][]): boolean {
         // One abs function.
         // One addition. One Absolute function. One condition in loop
         // One sum in loop

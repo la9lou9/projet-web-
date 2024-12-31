@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./MatrixGeneratorSm.css";
+import {genererSymPos} from "../fonctions/genererSymPos"
+import {MatrixSolver} from "../matrix-solver.ts";
 
 function MatrixGeneratorSm() {
   const [matrixSize, setMatrixSize] = useState(2);
@@ -69,27 +71,31 @@ function MatrixGeneratorSm() {
       .fill()
       .map(() => Array(size).fill(0));
 
-    for (let i = 0; i < size; i++) {
-      for (let j = 0; j < size; j++) {
-        if (matrixType === "Upper Triangular" && j < i) {
-          newMatrix[i][j] = 0;
-        } else if (matrixType === "Lower Triangular" && j > i) {
-          newMatrix[i][j] = 0;
-        } else if (matrixType === "Symmetric") {
-          const value = getRandomValue();
-          newMatrix[i][j] = value;
-          newMatrix[j][i] = value;
-        } else if (matrixType === "Band") {
-          newMatrix[i][j] =
-            Math.abs(i - j) <= bandWidth ? getRandomValue() : 0;
-        } else if (matrixType === "Upper Band") {
-          newMatrix[i][j] =
-            j >= i && j - i <= bandWidth ? getRandomValue() : 0;
-        } else if (matrixType === "Lower Band") {
-          newMatrix[i][j] =
-            i >= j && i - j <= bandWidth ? getRandomValue() : 0;
-        } else {
-          newMatrix[i][j] = getRandomValue();
+    if ( matrixType === "Symmetric" && matrixProperty === "Définie Positive" )
+      newMatrix = genererSymPos(size);
+    else {
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+          if (matrixType === "Upper Triangular" && j < i) {
+            newMatrix[i][j] = 0;
+          } else if (matrixType === "Lower Triangular" && j > i) {
+            newMatrix[i][j] = 0;
+          } else if (matrixType === "Symmetric") {
+            const value = getRandomValue();
+            newMatrix[i][j] = value;
+            newMatrix[j][i] = value;
+          } else if (matrixType === "Band") {
+            newMatrix[i][j] =
+                Math.abs(i - j) <= bandWidth ? getRandomValue() : 0;
+          } else if (matrixType === "Upper Band") {
+            newMatrix[i][j] =
+                j >= i && j - i <= bandWidth ? getRandomValue() : 0;
+          } else if (matrixType === "Lower Band") {
+            newMatrix[i][j] =
+                i >= j && i - j <= bandWidth ? getRandomValue() : 0;
+          } else {
+            newMatrix[i][j] = getRandomValue();
+          }
         }
       }
     }
@@ -105,50 +111,12 @@ function MatrixGeneratorSm() {
   };
 
   const stepByStepGaussSeidel = () => {
-    const size = matrix.length;
-    let x = Array(size).fill(0);
-    let prevX = [...x];
-    let iterations = 0;
-    let converged = false;
-    let stepResults = [];
-  
-    while (iterations < maxIterations) {
-      let iterationResult = { iteration: iterations + 1, solution: [...x] };
-  
-      for (let i = 0; i < size; i++) {
-        let sum = 0;
-        for (let j = 0; j < size; j++) {
-          if (j !== i) sum += matrix[i][j] * x[j];
-        }
-        x[i] = (vector[i] - sum) / matrix[i][i];
-      }
-  
-      const error = x.reduce((acc, xi, i) => acc + Math.abs(xi - prevX[i]), 0);
-  
-      if (error < epsilon) {
-        converged = true;
-        iterationResult.convergence = "Oui";
-        break;
-      }
-  
-      iterationResult.convergence = "Non";
-      prevX = [...x];
-      iterations++;
-      stepResults.push(iterationResult);
-    }
-  
-    // Ajout des résultats de la dernière itération
-    if (!converged) {
-      stepResults.push({
-        iteration: iterations + 1,
-        solution: [...x],
-        convergence: "Non"
-      });
-    }
+    let solver = gaussSeidel();
   
     // Créer le texte final à afficher dans la fenêtre
-    const finalText = stepResults.map((step) => {
-      return `Itération ${step.iteration} :\nSolution: ${step.solution.join(", ")}\nConvergence: ${step.convergence}\n\n`;
+    let i = 1;
+    const finalText = solver.getResults().map((step) => {
+      return `Itération ${i++} :\nSolution: ${step.new.join(", ")}\nError: ${step.error}\n\n`;
     }).join('');
   
     // Créer un fichier blob et lancer le téléchargement
@@ -166,34 +134,13 @@ function MatrixGeneratorSm() {
   
 
   const gaussSeidel = () => {
-    const size = matrix.length;
-    let x = Array(size).fill(0);
-    let prevX = [...x];
-    let iterations = 0;
-    let converged = false;
+    let solver = new MatrixSolver(matrix,vector);
+    let x = solver.solve(epsilon,maxIterations);
 
-    while (iterations < maxIterations) {
-      for (let i = 0; i < size; i++) {
-        let sum = 0;
-        for (let j = 0; j < size; j++) {
-          if (j !== i) sum += matrix[i][j] * x[j];
-        }
-        x[i] = (vector[i] - sum) / matrix[i][i];
-      }
-
-      const error = x.reduce((acc, xi, i) => acc + Math.abs(xi - prevX[i]), 0);
-
-      if (error < epsilon) {
-        converged = true;
-        break;
-      }
-
-      prevX = [...x];
-      iterations++;
-    }
-
+    let iterations = solver.getResults().length;
     setResult({ solution: x, iterations });
-    setIsConvergent(converged);
+    setIsConvergent(solver.getSolved() === "solved");
+    return solver;
   };
 
   return (

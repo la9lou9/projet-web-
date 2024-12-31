@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "../styles/container styles/MatrixDuplicator.css";
+import {MatrixSolver} from "../matrix-solver.ts";
 
 function MatrixDuplicator() {
   const [matrix, setMatrix] = useState(null);
@@ -35,57 +36,23 @@ function MatrixDuplicator() {
   };
 
   const gaussSeidel = (A, b, tolerance = 0.0001, maxIterations = 100) => {
-    const n = A.length;
-    let x = new Array(n).fill(0); // Initialisation du vecteur solution
-    let xOld = [...x]; // Copie de la solution initiale pour comparaison
-    const results = []; // Stocker les solutions de chaque itération
+    let solver = new MatrixSolver(A,b);
+    let x = solver.solve(tolerance,maxIterations);
 
-    let iter = 0;
-    while (iter < maxIterations) {
-      for (let i = 0; i < n; i++) {
-        let sum = b[i];
-        for (let j = 0; j < n; j++) {
-          if (i !== j) {
-            sum -= A[i][j] * x[j];
-          }
-        }
-        x[i] = sum / A[i][i];
-      }
-
-      results.push({ iteration: iter + 1, solution: [...x] });
-
-      let maxError = 0;
-      for (let i = 0; i < n; i++) {
-        maxError = Math.max(maxError, Math.abs(x[i] - xOld[i]));
-      }
-
-      if (maxError < tolerance) {
-        setSolution(x);
-        setIterations(iter + 1);
-        setIterationResults(results); // Enregistre toutes les itérations
-        saveFinalResultsToFile(x, iter + 1, true); // Sauvegarde la solution finale avec état de convergence
-        return;
-      }
-
-      xOld = [...x];
-      iter++;
-    }
-
+    saveFinalResultsToFile(x, solver.getResults().length, solver.getSolved() === "solved"); // Sauvegarde la solution finale avec état de convergence
     setSolution(x);
-    setIterations(maxIterations);
-    setIterationResults(results); // Enregistre toutes les itérations
-    saveFinalResultsToFile(x, maxIterations, false); // Sauvegarde la solution finale sans convergence
+    setIterations(solver.getResults.length);
+    setIterationResults(solver.getResults()); // Enregistre toutes les itérations
+    return solver
   };
 
   const saveStepByStepResults = () => {
-    if (!iterationResults.length) {
-      setStatusMessage("Veuillez d'abord appliquer la méthode Gauss-Seidel.");
-      return;
-    }
+    let solver = gaussSeidel();
   
-    // Déterminer l'état de convergence à partir des résultats
     const hasConverged =
-      iterations < maxIterations && iterationResults[iterations - 1];
+      solver.getSolved() !== "solved";
+
+    let i = 1;
   
     const finalText = `
   Résultats complets par itération :
@@ -93,15 +60,17 @@ function MatrixDuplicator() {
   ${iterationResults
       .map(
         (result) =>
-          `Itération ${result.iteration} :\n` +
-          `Solution: ${result.solution
-            .map((value, index) => `x${index + 1} = ${value.toFixed(6)}`)
+          `Itération ${i++} :\n` +
+          `Solution: ${result.new
+            .map((value, index) => `x${index + 1} = ${value.toFixed(3)}`)
             .join(", ")}\n`
       )
       .join("\n")}
   Nombre total d'itérations effectuées : ${iterations}
   Convergence : ${hasConverged ? "Oui" : "Non"}
   `;
+
+    console.log(finalText);
   
     // Création du Blob contenant le texte
     const blob = new Blob([finalText], { type: "text/plain" });
@@ -122,7 +91,7 @@ function MatrixDuplicator() {
   const saveFinalResultsToFile = (solution, iterations, hasConverged) => {
     const resultText = `
 Solution finale :
-${solution.map((value, index) => `x${index + 1} = ${value.toFixed(6)}`).join("\n")}
+${solution.map((value, index) => `x${index + 1} = ${value.toFixed(3)}`).join("\n")}
 
 Nombre d'itérations : ${iterations}
 Convergence : ${hasConverged ? "Oui" : "Non"}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/container styles/Matrix.css";
+import {MatrixSolver} from "../matrix-solver.ts";
 
 function Matrix({ generatedMatrix, onSizeChange, onResult }) {
   const initialSize = generatedMatrix ? generatedMatrix.length : 3;
@@ -106,34 +107,21 @@ function Matrix({ generatedMatrix, onSizeChange, onResult }) {
 
     const A = matrix.map((row) => row.map((cell) => parseFloat(cell)));
     const B = columnVector.map((val) => parseFloat(val));
-    const X = Array(size).fill(0); // Initialisation du vecteur solution
 
-    for (let iter = 0; iter < maxIterations; iter++) {
-      const X_old = [...X];
-      for (let i = 0; i < size; i++) {
-        let sum = 0;
-        for (let j = 0; j < size; j++) {
-          if (i !== j) sum += A[i][j] * X[j];
-        }
-        X[i] = (B[i] - sum) / A[i][i];
-      }
+    let solver = new MatrixSolver(A,B);
+    const X = solver.solve(tolerance,maxIterations);
 
-      // Vérification de la convergence
-      const error = Math.sqrt(
-        X.reduce((acc, x, idx) => acc + (x - X_old[idx]) ** 2, 0)
-      );
-      if (error < tolerance) {
-        const solution = X.map((x) => x.toFixed(6));
+    if (solver.getSolved() == "solved") {
+        const solution = X.map((x) => x.toFixed(3));
         if (onResult) {
           onResult({
             solution,
-            iterations: iter + 1,
+            iterations: solver.getResults().length,
             converged: true,
           });
         }
         alert(`Solution trouvée : [${solution.join(", ")}]`);
         return;
-      }
     }
     if (onResult) {
       onResult({
